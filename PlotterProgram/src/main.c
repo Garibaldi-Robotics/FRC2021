@@ -1,40 +1,180 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdbool.h>
 #include <raylib.h>
 
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
 #include <raygui.h>
 
-#define GUI_FILE_DIALOG_IMPLEMENTATION
-#include "gui_file_dialog.h"
+typedef struct POI
+{
+    int x, y;
+} POI;
+
+
+int poisLength = 0;
+int selectedPOI = 0;
+POI pois[128];
+
+void newFile() {
+    for (int i = 0; i < 128; i++)
+        pois[i] = (POI) {0};
+    poisLength = 0;
+}
+
+char* intToString(int j) {
+    char* output = malloc(sizeof(j));
+    sprintf(output, "%i", j);
+    return output;
+}
+
+void saveFile() {
+
+    if (poisLength < 2) return;
+
+    char* file = malloc(poisLength * (4 + sizeof(int) * 2));
+    int filePos = 0;
+
+    sprintf(file, "%i,%i", pois[0].x, pois[0].y);
+    for (int i = 1; i < poisLength; i++)
+        sprintf(file, "%s\n%i,%i", file, pois[i].x, pois[i].y);
+    
+    SaveFileText(TextFormat("%s", "./output.csv"), file);
+}
+
+void newPOI() {
+    pois[poisLength] = (POI) {0};
+    poisLength++;
+}
+
+void removePOI() {
+
+    if (selectedPOI == poisLength -1) {
+        poisLength--;
+        return;
+    }
+
+    for (int i = selectedPOI + 1; i < poisLength; i++)
+        pois[i -1] = pois[i];
+
+    poisLength--;
+    
+}
 
 int main(void) {
-    
     const int screenWidth = 1920;
     const int screenHeight = 1080;
 
-    InitWindow(screenWidth, screenHeight, "Auto Plotter 2.0");
-    SetTargetFPS(30);
+    InitWindow(screenWidth, screenHeight, "Auto Plotter 2");
+    SetTargetFPS(60);
 
+    //GuiLoadStyle("resources/cyber/cyber.rgs");
 
+    Vector2 fieldOffset = (Vector2) {248, 28};
     Vector2 mousePosition = { 0 };
-
+    int topButton = -1;
 
     while (!WindowShouldClose())
     {
         mousePosition = GetMousePosition();
 
-
-
-
+            
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        GuiPanel((Rectangle) {0, 0, screenWidth, 30});
-        GuiButton((Rectangle) {0, 0, 60, 30}, "test");
+        //#region Field plotting
 
+        // Draw lines between points
+        for (int i = 0; i < poisLength; i++)
+        {
+            if (poisLength > 1 && i > 0)
+                DrawLine(pois[i -1].x + fieldOffset.x, pois[i -1].y + fieldOffset.y, pois[i].x + fieldOffset.x, pois[i].y + fieldOffset.y, RED);
+        }
+
+        // Draw points
+        for (int i = 0; i < poisLength; i++)
+        {
+            if (i == 0) {
+
+                if (selectedPOI == i)
+                    DrawCircle(pois[i].x + fieldOffset.x, pois[i].y + fieldOffset.y, 8, GREEN);
+                else
+                    DrawCircle(pois[i].x + fieldOffset.x, pois[i].y + fieldOffset.y, 8, BLUE);
+
+            } else {
+
+                if (selectedPOI == i)
+                    DrawCircle(pois[i].x + fieldOffset.x, pois[i].y + fieldOffset.y, 8, GREEN);
+                else
+                    DrawCircle(pois[i].x + fieldOffset.x, pois[i].y + fieldOffset.y, 8, RED);
+                
+            }
+        }
+        
+        //#endregion
+
+        //#region Sidebar
+        GuiPanel((Rectangle) {0, 20, 240, screenHeight - 20});
+
+        
+        if (GuiButton((Rectangle) {2, 40, 236, 30}, "New POI")) {
+            newPOI();
+        }
+        if (GuiButton((Rectangle) {2, 72, 236, 30}, "Remove POI")) {
+            removePOI();
+        }
+
+        GuiPanel((Rectangle) {2, 120, 236, 120});
+        GuiLabel((Rectangle) {4, 120, 232, 30}, FormatText("Selected: POI%i", selectedPOI));
+
+
+        Rectangle xValueBoxRect = (Rectangle) {34, 150, 102, 20};
+        if (CheckCollisionPointRec(mousePosition, xValueBoxRect))
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, 1000, true);
+        else
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, 1000, false);
+
+        Rectangle yValueBoxRect = (Rectangle) {34, 180, 102, 20};
+        if (CheckCollisionPointRec(mousePosition, yValueBoxRect))
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, 1000, true);
+        else
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, 1000, false);
+
+        
+        GuiValueBox((Rectangle) {34, 180, 102, 20}, "Y: ", &pois[selectedPOI].y, 0, 1000, false);
+
+        GuiPanel((Rectangle) {2, 244, 236, 720});
+        for (int i = 0; i < poisLength; i++)
+        {
+
+            if (selectedPOI == i) {
+                GuiDisable();
+                if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i)))
+                    selectedPOI = i;
+                GuiEnable();
+            } else
+            {
+               if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i)))
+                    selectedPOI = i; 
+            }
+            
+        }
+
+        GuiPanel((Rectangle) {0, 964, 240, screenHeight - 964});
+        
+        //#endregion
+
+        //#region TopBar
+        GuiPanel((Rectangle) {0, 0, screenWidth, 20});
+
+        if (GuiButton((Rectangle) {0, 0, 40, 20}, "New")) newFile();
+        if (GuiButton((Rectangle) {41, 0, 40, 20}, "Save")) saveFile();
+        if (GuiButton((Rectangle) {82, 0, 85, 20}, "Fullscreen")) ToggleFullscreen();
+
+        //#endregion
+=
         EndDrawing();
     }
 
