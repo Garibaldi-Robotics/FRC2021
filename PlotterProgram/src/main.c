@@ -9,7 +9,7 @@
 
 typedef struct POI
 {
-    int x, y;
+    int x, y, action;
 } POI;
 
 
@@ -23,24 +23,18 @@ void newFile() {
     poisLength = 0;
 }
 
-char* intToString(int j) {
-    char* output = malloc(sizeof(j));
-    sprintf(output, "%i", j);
-    return output;
-}
-
 void saveFile() {
 
     if (poisLength < 2) return;
 
-    char* file = malloc(poisLength * (4 + sizeof(int) * 2));
+    char* file = malloc(poisLength * (4 + sizeof(int) * 3));
     int filePos = 0;
 
-    sprintf(file, "%i,%i", pois[0].x, pois[0].y);
+    sprintf(file, "%i,%i,%i", pois[0].x, pois[0].y, pois[0].action);
     for (int i = 1; i < poisLength; i++)
-        sprintf(file, "%s\n%i,%i", file, pois[i].x, pois[i].y);
+        sprintf(file, "%s\n%i,%i,%i", file, pois[i].x, pois[i].y, pois[i].action);
     
-    SaveFileText(TextFormat("%s", "./output.csv"), file);
+    SaveFileText("./output.csv", file);
 }
 
 void newPOI() {
@@ -74,6 +68,9 @@ int main(void) {
     Vector2 fieldOffset = (Vector2) {248, 28};
     Vector2 mousePosition = { 0 };
     int topButton = -1;
+
+    int dropdownActive = 0;
+    bool dropdownEditMode = false;
 
     while (!WindowShouldClose())
     {
@@ -129,21 +126,19 @@ int main(void) {
         GuiPanel((Rectangle) {2, 120, 236, 120});
         GuiLabel((Rectangle) {4, 120, 232, 30}, FormatText("Selected: POI%i", selectedPOI));
 
-
         Rectangle xValueBoxRect = (Rectangle) {34, 150, 102, 20};
         if (CheckCollisionPointRec(mousePosition, xValueBoxRect))
-            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, 1000, true);
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth, true);
         else
-            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, 1000, false);
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth, false);
 
         Rectangle yValueBoxRect = (Rectangle) {34, 180, 102, 20};
         if (CheckCollisionPointRec(mousePosition, yValueBoxRect))
-            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, 1000, true);
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenWidth, true);
         else
-            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, 1000, false);
-
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenWidth, false);
         
-        GuiValueBox((Rectangle) {34, 180, 102, 20}, "Y: ", &pois[selectedPOI].y, 0, 1000, false);
+        if (dropdownEditMode) GuiDisable();
 
         GuiPanel((Rectangle) {2, 244, 236, 720});
         for (int i = 0; i < poisLength; i++)
@@ -151,18 +146,31 @@ int main(void) {
 
             if (selectedPOI == i) {
                 GuiDisable();
-                if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i)))
+                if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i))) {
                     selectedPOI = i;
+                    dropdownActive = pois[selectedPOI].action;
+                }
                 GuiEnable();
             } else
             {
-               if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i)))
-                    selectedPOI = i; 
+               if (GuiButton((Rectangle) {4, 242 + (32 * i), 232, 30}, TextFormat("POI%i", i))) {
+                    selectedPOI = i;
+                    dropdownActive = pois[selectedPOI].action;
+                }
             }
             
         }
 
+        GuiEnable();
+
         GuiPanel((Rectangle) {0, 964, 240, screenHeight - 964});
+
+        if (GuiDropdownBox((Rectangle) {34, 210, 102, 20}, "None;Load;Launch", &dropdownActive, dropdownEditMode)) {
+            dropdownEditMode = !dropdownEditMode;
+            TraceLog(LOG_INFO, "%i", dropdownActive);
+            pois[selectedPOI].action = dropdownActive;
+        }
+
         
         //#endregion
 
@@ -174,7 +182,7 @@ int main(void) {
         if (GuiButton((Rectangle) {82, 0, 85, 20}, "Fullscreen")) ToggleFullscreen();
 
         //#endregion
-=
+
         EndDrawing();
     }
 
