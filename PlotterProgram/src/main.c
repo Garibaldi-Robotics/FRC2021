@@ -27,18 +27,72 @@ void saveFile() {
 
     if (poisLength < 2) return;
 
-    char* file = malloc(poisLength * (4 + sizeof(int) * 3));
+    char* file = malloc(poisLength * (3 + sizeof(int) * 3));
     int filePos = 0;
 
-    sprintf(file, "%i,%i,%i", pois[0].x, pois[0].y, pois[0].action);
-    for (int i = 1; i < poisLength; i++)
-        sprintf(file, "%s\n%i,%i,%i", file, pois[i].x, pois[i].y, pois[i].action);
+
+    if (poisLength > 100)
+        sprintf(file, "%i", poisLength);
+    else if (poisLength > 10)
+        sprintf(file, "0%i", poisLength);
+    else
+        sprintf(file, "00%i", poisLength);
+
+    for (int i = 0; i < poisLength; i++)
+        sprintf(file, "%s\n%i,%i,%i,", file, pois[i].x, pois[i].y, pois[i].action);
     
-    SaveFileText("./output.csv", file);
+    SaveFileText("./route.csv", file);
+}
+
+void openFile() {
+    newFile();
+
+    char* file = LoadFileText("./route.csv");
+    char poiAmmount[3];
+
+    for (int i = 0; i < strlen(file); i++) {
+        if (file[i] == '\n') break;
+        
+        sprintf(poiAmmount, "%c", file[i]);
+    }
+    poisLength = TextToInteger(poiAmmount);
+
+    int pos = 4;
+    for (int i = 0; i < poisLength; i++) {
+        char line[12] = "";
+
+        // Seperate first line
+        for (int j = pos; j < strlen(file); j++) {
+            if (file[j] == '\n') {
+                pos++;
+                break;
+            }
+            sprintf(line, "%s%c", line, file[j]);
+            pos++;
+        }
+
+        char currNum[4] = "";
+        int currNumIndex = 0;
+        for (int j = 0; j < 12; j++) {
+            if (line[j] == ',') {
+
+                if (currNumIndex == 0)
+                    pois[i].x = TextToInteger(currNum);
+                else if (currNumIndex == 1)
+                    pois[i].y = TextToInteger(currNum);
+                else
+                    pois[i].action = TextToInteger(currNum);
+                
+                sprintf(currNum, "");
+                currNumIndex++;
+            } else
+                sprintf(currNum, "%s%c", currNum, line[j]);
+        }
+    }
 }
 
 void newPOI() {
-    pois[poisLength] = (POI) {0};
+    pois[poisLength] = (POI) { pois[selectedPOI].x, pois[selectedPOI].y, 0};
     poisLength++;
 }
 
@@ -76,7 +130,7 @@ int main(void) {
     {
         mousePosition = GetMousePosition();
 
-            
+        
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -128,15 +182,15 @@ int main(void) {
 
         Rectangle xValueBoxRect = (Rectangle) {34, 150, 102, 20};
         if (CheckCollisionPointRec(mousePosition, xValueBoxRect))
-            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth, true);
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth - 240, true);
         else
-            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth, false);
+            GuiValueBox(xValueBoxRect, "X: ", &pois[selectedPOI].x, 0, screenWidth - 240, false);
 
         Rectangle yValueBoxRect = (Rectangle) {34, 180, 102, 20};
         if (CheckCollisionPointRec(mousePosition, yValueBoxRect))
-            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenWidth, true);
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenHeight - 20, true);
         else
-            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenWidth, false);
+            GuiValueBox(yValueBoxRect, "Y: ", &pois[selectedPOI].y, 0, screenWidth - 20, false);
         
         if (dropdownEditMode) GuiDisable();
 
@@ -179,7 +233,8 @@ int main(void) {
 
         if (GuiButton((Rectangle) {0, 0, 40, 20}, "New")) newFile();
         if (GuiButton((Rectangle) {41, 0, 40, 20}, "Save")) saveFile();
-        if (GuiButton((Rectangle) {82, 0, 85, 20}, "Fullscreen")) ToggleFullscreen();
+        if (GuiButton((Rectangle) {82, 0, 40, 20}, "Open")) openFile();
+        if (GuiButton((Rectangle) {123, 0, 85, 20}, "Fullscreen")) ToggleFullscreen();
 
         //#endregion
 
