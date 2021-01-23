@@ -90,6 +90,8 @@ int main(int, char**) {
     
 
     VideoCapture camera(0);
+    camera.set(CAP_PROP_FPS, 30);
+    camera.set(CAP_PROP_AUTO_WB, true);
 
     if (!camera.isOpened()) {
         printf("Couldn't open camera");
@@ -108,10 +110,7 @@ int main(int, char**) {
 
     createTrackbar("LowV", "Control", &iLowV, 255);
     createTrackbar("HighV", "Control", &iHighV, 255);
-
-    int whitebal = 0;
-    createTrackbar("WhiteBal", "Control", &whitebal, 100);
-    camera.set(CAP_PROP_AUTO_WB, false);
+    
 
     Mat frame;
 
