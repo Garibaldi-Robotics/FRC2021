@@ -1,18 +1,26 @@
 #include <iostream>
 #include <stdio.h>
-#include <opencv2/opencv.hpp>
 
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d.hpp>
+
+using namespace std;
 using namespace cv;
 
 
-int iLowH = 0;
-int iHighH = 255;
+int iLowH = 38;
+int iHighH = 77;
 
-int iLowS = 0; 
-int iHighS = 255;
+int iLowS = 83; 
+int iHighS = 137;
 
-int iLowV = 0;
-int iHighV = 255;
+int iLowV = 83;
+int iHighV = 145;
+
+vector<KeyPoint> blobs;
 
 Mat process(Mat frameMat) {
     Mat resizeMat;
@@ -32,8 +40,53 @@ Mat process(Mat frameMat) {
     return maskMat;
 }
 
+void detect(Mat frame) {
+
+    SimpleBlobDetector::Params params;
+
+    // Threshold, (write what this does)
+    params.thresholdStep = 10;
+    params.minThreshold = 10;
+    params.maxThreshold = 220;
+
+    // Minimum repeatability, (write what this does)
+    params.minRepeatability = 2;
+
+    // Minimum distance between blobs (in pixels?)
+    params.minDistBetweenBlobs = 10;
+
+    // Colour filtering (write what this does)
+    params.filterByColor = false;
+    params.blobColor = 0;
+
+    // Area filtering (write what this does)
+    params.filterByArea = false;
+    params.minArea = 25;
+    params.maxArea = 5000;
+
+    // Circularity filtering (write what this does)
+    params.filterByCircularity = true;
+    params.minCircularity = 0.9f;
+    params.maxCircularity = (float)1e37;
+
+    // Inertia filtering (write what this does)
+    params.filterByInertia = false;
+    params.minInertiaRatio = 0.1f;
+    params.maxInertiaRatio = (float)1e37;
+
+    // Convexity filtering (write what this does)
+    params.filterByConvexity = false;
+    params.minConvexity = 0.95f;
+    params.maxConvexity = (float)1e37;
+
+    
+    Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
+	detector->detect(frame, blobs);
+}
 
 int main(int, char**) {
+
+    std::cout << getBuildInformation() << std::endl;
     
 
     VideoCapture camera(0);
@@ -64,15 +117,20 @@ int main(int, char**) {
 
     while (true)
     {
+
         camera >> frame;
         Mat output = process(frame);
+
+        detect(output);
+        drawKeypoints(output, blobs, output);
+        
         imshow("Webcam", output);
 
         if (waitKey(10) >= 0)
             break;
     }
     
-
+    camera.release();
 
 }
 

@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(JetsonVision VERSION 0.1.0)
 
-#set(CMAKE_SYSTEM_NAME Linux)
-#set(CMAKE_SYSTEM_PROCESSOR x86_64)
-#set(CMAKE_C_COMPILER gcc)
-#set(CMAKE_CXX_COMPILER g++)
-
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR arm)
-set(CMAKE_C_COMPILER arm-none-eabi-gcc)
-set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
+set(CMAKE_C_COMPILER gcc)
+set(CMAKE_CXX_COMPILER g++)
+
+#set(CMAKE_SYSTEM_NAME Linux)
+#set(CMAKE_SYSTEM_PROCESSOR arm)
+#set(CMAKE_C_COMPILER arm-none-eabi-gcc)
+#set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
 
 #set(CMAKE_SYSTEM_NAME Windows)
 #set(CMAKE_SYSTEM_PROCESSOR x86_64)
