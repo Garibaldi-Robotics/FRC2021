@@ -33,43 +33,18 @@ public class TeleopDrive {
          *  225 180 135
         */
 
-        
-        
-        if (angle == 0 || angle == 360)
-            move = YourMa.FORWARD;
-        if (angle > 0 && angle < 45)
-            move = YourMa.BlendBetween(YourMa.FORWARD_RIGHT, YourMa.FORWARD, Math.abs(x));
-        if (angle == 45)
-            move = YourMa.FORWARD_RIGHT;
-        if (angle > 45 && angle < 90)
-            move = YourMa.BlendBetween(YourMa.RIGHT, YourMa.FORWARD_RIGHT, Math.abs(y));
 
-        if (angle == 90)
-            move = YourMa.RIGHT;
-        if (angle > 90 && angle < 135)
-            move = YourMa.BlendBetween(YourMa.BACKWARD_RIGHT, YourMa.RIGHT, Math.abs(y));
-        if (angle == 135)
-            move = YourMa.BACKWARD_RIGHT;
-        if (angle > 135 && angle < 180)
-            move = YourMa.BlendBetween(YourMa.BACKWARD_RIGHT, YourMa.BACKWARD, Math.abs(x));
+        //TODO: test this
 
-        if (angle == 180)
-            move = YourMa.BACKWARD;
-        if (angle > 180 && angle < 225)
-            move = YourMa.BlendBetween(YourMa.BACKWARD_LEFT, YourMa.BACKWARD, Math.abs(x));
-        if (angle == 225)
-            move = YourMa.BACKWARD_LEFT;
-        if (angle > 225 && angle < 270)
-            move = YourMa.BlendBetween(YourMa.LEFT, YourMa.BACKWARD_LEFT, Math.abs(y));
+        if (angle >= 0 && angle < 90)
+            move = YourMa.BlendBetween(YourMa.FORWARD, YourMa.RIGHT, Math.abs(x));
+        if (angle >= 90 && angle < 180)
+            move = YourMa.BlendBetween(YouMa.RIGHT, YourMa.BACKWARD, Math.abs(x));
+        if (angle >= 180 && angle < 270)
+            move = YourMa.BlandBetween(YourMa.BACKWARD, YourMa.LEFT, Math.abs(x));
+        if (angle >= 270 && angle < 360)
+            move = YourMa.BlendBetween(YourMa.LEFT, YourMa.FORWARD, Math.abs(x));
 
-        if (angle == 270)
-            move = YourMa.LEFT;
-        if (angle > 270 && angle < 315)
-            move = YourMa.BlendBetween(YourMa.FORWARD_LEFT, YourMa.LEFT, Math.abs(y));
-        if (angle == 315)
-            move = YourMa.FORWARD_LEFT;
-        if (angle > 315 && angle < 360)
-            move = YourMa.BlendBetween(YourMa.FORWARD, YourMa.FORWARD_LEFT, Math.abs(x));
 
         return move;
     }

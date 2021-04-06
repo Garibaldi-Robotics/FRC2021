@@ -11,14 +11,17 @@ using namespace std;
 using namespace cv;
 
 
-int iLowH = 38;
-int iHighH = 77;
+int iLowH = 0;
+int iHighH = 255;
 
-int iLowS = 83; 
-int iHighS = 137;
+int iLowS = 0; 
+int iHighS = 255;
 
-int iLowV = 83;
-int iHighV = 145;
+int iLowV = 0;
+int iHighV = 255;
+
+int contrast = 2;
+int brightness = 20;
 
 vector<KeyPoint> blobs;
 
@@ -29,12 +32,18 @@ Mat process(Mat frameMat) {
     Mat blurMat;
     boxFilter(resizeMat, blurMat, -1, Size(20, 20));
 
+    Mat brightenMat;
+    blurMat.convertTo(brightenMat, -1, 1, brightness - 50);
+
+    Mat contrastMat;
+    brightenMat.convertTo(contrastMat, -1, contrast, 0);
+
     Mat thresholdMat;
-    inRange(blurMat, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), thresholdMat);
+    inRange(contrastMat, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), thresholdMat);
     cvtColor(thresholdMat, thresholdMat, COLOR_GRAY2BGR);
     
     Mat maskMat;
-    bitwise_and(blurMat, thresholdMat, maskMat);
+    bitwise_and(contrastMat, thresholdMat, maskMat);
 
 
     return maskMat;
@@ -110,6 +119,9 @@ int main(int, char**) {
 
     createTrackbar("LowV", "Control", &iLowV, 255);
     createTrackbar("HighV", "Control", &iHighV, 255);
+
+    createTrackbar("Brightness", "Control", &brightness, 100);
+    createTrackbar("Contrast", "Control", &contrast, 5);
     
 
     Mat frame;

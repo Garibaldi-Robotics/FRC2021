@@ -13,6 +13,8 @@ public class Robot extends TimedRobot {
 
   // cause static functions are for suckers
   TeleopDrive teleop = new TeleopDrive();
+
+  Flywheel flywheel = new Flywheel(5);
   
 
   @Override
@@ -81,6 +83,9 @@ public class Robot extends TimedRobot {
     if (controller.getRawButtonPressed(1)) {
       pneumatics.toggleSolenoids();
     }
+
+
+    if (controller.getRawButtonPressed)
     
   }
 

@@ -25,12 +25,6 @@ public class DriveMotors {
         this.biases = biases;
     }
 
-    public DriveMotors(Type type) {
-        if (type != Type.TitanQuad) return;
-
-
-    }
-
     public void driveUniform(double speed, Axis axis) {
 
         double speeds[] = new double[4];

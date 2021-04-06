@@ -1,3 +1,10 @@
+/*
+ * Almost all of this code is taken from Wikipedia
+ * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+ * 
+*/
+
+
 #include <math.h>
 
 typedef struct Quaternion {
@@ -29,5 +36,13 @@ EulerAngles ToEulerAngles(Quaternion q) {
 	angles.yaw = atan2(siny_cosp, cosy_cosp);
 
 	return angles;
+}
+
+void ToDeg(EulerAngles* angles) { 
+
+	angles->roll = (angles->roll + PI) * 180/PI;
+	angles->pitch = (angles->pitch + PI) * 180/PI;
+	angles->yaw = (angles->yaw + PI) * 180/PI;
+
 }
 	
