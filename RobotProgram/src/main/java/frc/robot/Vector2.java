@@ -1,7 +1,7 @@
 package frc.robot;
 
 public class Vector2 {
-    double x, y;
+    public double x, y;
 
     public Vector2() {
         x = 0;

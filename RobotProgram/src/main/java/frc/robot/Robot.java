@@ -3,10 +3,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.DriveMotors.Axis;
+import frc.robot.drive.*;
 
 public class Robot extends TimedRobot {
 
-  public static DriveMotors driveMotors;
+  public static MecanumDrive mecanumDrive;
   public static Pneumatics pneumatics;
   public static BNO08x imu;
 
@@ -18,11 +19,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    mecanumDrive = new MecanumBuilder()
+      .addMotorRF(0)
+      .addMotorLF(1)
+      .addMotorRB(2)
+      .addMotorLB(3)
+      .build();
+
     //imu = new BNO08x();
     controller = new Joystick(0);
     teleop = new TeleopDrive();
 
-    driveMotors = new DriveMotors(new int[]{1, 2, 3, 4}, new int[]{1, -1, 1, -1});
     pneumatics = new Pneumatics();
     flywheel = new Flywheel(5);
   }
@@ -44,28 +51,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    if (timedAuto.isTime(0)) {
-      driveMotors.drive(new double[] {0.1, 0, 0, 0});
-    }
-
-    if (timedAuto.isTime(1)) {
-      driveMotors.drive(new double[] {0, 0.1, 0, 0});
-    }
-
-    if (timedAuto.isTime(2)) {
-      driveMotors.drive(new double[] {0, 0, 0.1, 0});
-    }
-
-    if (timedAuto.isTime(3)) {
-      driveMotors.drive(new double[] {0, 0, 0, 0.1});
-    }
-
-    if (timedAuto.isTime(4.5)) {
-      driveMotors.stop();
-    }
-
     
-
   }
 
   @Override
@@ -79,11 +65,11 @@ public class Robot extends TimedRobot {
     //Vector3 rotation = imu.read();
 
     YourMa drive = teleop.drive(controller);
-    //YourMa steering = teleop.rotate(controller);
+    YourMa steering = teleop.rotate(controller, imu.read().y);
 
-    //YourMa finalMove = YourMa.BlendBetween(drive, steering, 0.5);
+    YourMa finalMove = YourMa.BlendBetween(drive, steering, 0.5);
 
-    drive.drive(driveMotors, controller.getRawAxis(3));
+    //finalMove.drive(driveMotors, controller.getRawAxis(3));
 
     if (controller.getRawButtonPressed(1)) {
       pneumatics.toggleSolenoids();
@@ -94,9 +80,6 @@ public class Robot extends TimedRobot {
       flywheel.setRPM(5800);
     else
       flywheel.setRPM(0);
-    
-    if (controller.getRawButton(3))
-      driveMotors.stop();
   }
 
   @Override

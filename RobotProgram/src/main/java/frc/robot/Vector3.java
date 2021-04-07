@@ -2,7 +2,7 @@ package frc.robot;
 
 public class Vector3 {
 
-    double x, y, z;
+    public double x, y, z;
 
     public Vector3() {
         x = 0;
