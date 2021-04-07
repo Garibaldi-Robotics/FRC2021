@@ -15,6 +15,9 @@ public class Pneumatics {
         compressor = new Compressor();
         solenoid1 = new DoubleSolenoid(0, 0, 1);
         solenoid2 = new DoubleSolenoid(0, 6, 7);
+        
+        solenoid1.set(DoubleSolenoid.Value.kReverse);
+        solenoid2.set(DoubleSolenoid.Value.kReverse);
 
         compressor.setClosedLoopControl(true);
     }
