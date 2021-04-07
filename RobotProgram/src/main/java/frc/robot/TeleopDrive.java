@@ -15,8 +15,8 @@ public class TeleopDrive {
         x = deadzone(x, deadzone);
         y = deadzone(y, deadzone);
         
-        if (x == 0 && y == 0)
-            return new YourMa(YourMa.STOP);
+        //if (x == 0 && y == 0)
+        //    return new YourMa(YourMa.STOP);
         
 
         double angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
@@ -33,17 +33,25 @@ public class TeleopDrive {
          *  225 180 135
         */
 
+        angle = controller.getPOV(0);
 
-        //TODO: test this
+        if (angle >= 337.5 || angle < 22.5)
+            move = YourMa.FORWARD;
+        if (angle >= 22.5 && angle < 67.5)
+            move = YourMa.FORWARD_RIGHT;
+        if (angle >= 67.5 && angle < 112.5)
+            move = YourMa.RIGHT;
+        if (angle >= 112.5 && angle < 157.5)
+            move = YourMa.BACKWARD_RIGHT;
+        if (angle >= 157.5 && angle < 202.5)
+            move = YourMa.BACKWARD;
+        if (angle >= 202.5 && angle < 247.5)
+            move = YourMa.BACKWARD_LEFT;
+        if (angle >= 247.5 && angle < 292.5)
+            move = YourMa.LEFT;
+        if (angle >= 292.5 && angle < 337.5)
+            move = YourMa.FORWARD_LEFT;
 
-        if (angle >= 0 && angle < 90)
-            move = YourMa.BlendBetween(YourMa.FORWARD, YourMa.RIGHT, Math.abs(x));
-        if (angle >= 90 && angle < 180)
-            move = YourMa.BlendBetween(YouMa.RIGHT, YourMa.BACKWARD, Math.abs(x));
-        if (angle >= 180 && angle < 270)
-            move = YourMa.BlandBetween(YourMa.BACKWARD, YourMa.LEFT, Math.abs(x));
-        if (angle >= 270 && angle < 360)
-            move = YourMa.BlendBetween(YourMa.LEFT, YourMa.FORWARD, Math.abs(x));
 
 
         return move;

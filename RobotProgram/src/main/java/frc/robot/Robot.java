@@ -2,25 +2,29 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.DriveMotors.Axis;
 
 public class Robot extends TimedRobot {
 
   public static DriveMotors driveMotors;
   public static Pneumatics pneumatics;
-  public static BNO08x imu = new BNO08x();
+  public static BNO08x imu;
 
-  Joystick controller = new Joystick(0);
+  Joystick controller;
 
-  // cause static functions are for suckers
-  TeleopDrive teleop = new TeleopDrive();
-
-  Flywheel flywheel = new Flywheel(5);
+  TeleopDrive teleop;
+  Flywheel flywheel;
   
 
   @Override
   public void robotInit() {
+    //imu = new BNO08x();
+    controller = new Joystick(0);
+    teleop = new TeleopDrive();
+
     driveMotors = new DriveMotors(new int[]{1, 2, 3, 4}, new int[]{1, -1, 1, -1});
     pneumatics = new Pneumatics();
+    flywheel = new Flywheel(5);
   }
 
   @Override
@@ -32,7 +36,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    imu.init();
+    //imu.init();
 
     timedAuto = new TimedAuto();
     timedAuto.start();
@@ -66,17 +70,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    imu.init();
+    //imu.init();
   }
+
 
   @Override
   public void teleopPeriodic() {
     //Vector3 rotation = imu.read();
 
     YourMa drive = teleop.drive(controller);
-    YourMa steering = teleop.rotate(controller);
+    //YourMa steering = teleop.rotate(controller);
 
-    YourMa finalMove = YourMa.BlendBetween(drive, steering, 0.5);
+    //YourMa finalMove = YourMa.BlendBetween(drive, steering, 0.5);
 
     drive.drive(driveMotors, controller.getRawAxis(3));
 
@@ -85,8 +90,13 @@ public class Robot extends TimedRobot {
     }
 
 
-    if (controller.getRawButtonPressed)
+    if (controller.getRawButton(2))
+      flywheel.setRPM(5800);
+    else
+      flywheel.setRPM(0);
     
+    if (controller.getRawButton(3))
+      driveMotors.stop();
   }
 
   @Override

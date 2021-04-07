@@ -15,8 +15,8 @@ public class YourMa {
     public static final YourMa LEFT = new YourMa(-1, 1, 1, -1);
     public static final YourMa RIGHT = new YourMa(1, -1, -1, 1);
 
-    public static final YourMa FORWARD_LEFT = new YourMa(1, 0, 0, 1);
-    public static final YourMa FORWARD_RIGHT = new YourMa(0, 1, 1, 0);
+    public static final YourMa FORWARD_LEFT = new YourMa(0, 1, 1, 0);
+    public static final YourMa FORWARD_RIGHT = new YourMa(1, 0, 0, 1);
     public static final YourMa BACKWARD_LEFT = new YourMa(-1, 0, 0, -1);
     public static final YourMa BACKWARD_RIGHT = new YourMa(0, -1, -1, 0);
 

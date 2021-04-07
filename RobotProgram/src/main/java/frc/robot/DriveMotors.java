@@ -51,14 +51,21 @@ public class DriveMotors {
 
     public void drive(double[] speeds) {
         for (int i = 0; i < 4; i++) {
-            motors[i].set(speeds[i] * biases[i]);
+            setMotor(i, speeds[i] * biases[i]);
         }
     }
 
     public void stop() {
         for (int i = 0; i < 4; i++) {
-            motors[i].disable();
+            setMotor(i, 0);
         }
+    }
+
+    private void setMotor(int motor, double speed) {
+        if (speed == 0 || speed == -0)
+            speed = 0.001;
+
+        motors[motor].set(speed);
     }
 
 

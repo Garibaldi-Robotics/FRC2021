@@ -1,4 +1,7 @@
+package frc.robot;
+
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 
 public class Flywheel {
@@ -9,6 +12,7 @@ public class Flywheel {
 
     public Flywheel(int CANID) {
         motor = new CANSparkMax(CANID, MotorType.kBrushless);
+        motor.setInverted(true);
         encoder = motor.getEncoder();
     }
 
@@ -21,6 +25,8 @@ public class Flywheel {
         if (currentRPM > rpm) {
             motor.set(rpm / currentRPM);
         }
+
+        return currentRPM == rpm;
     }
 
     public double getRPM() {
