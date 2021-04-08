@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.shooter;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -14,17 +14,17 @@ public class Pneumatics {
     public Pneumatics() {
         compressor = new Compressor();
         solenoid1 = new DoubleSolenoid(0, 0, 1);
-        solenoid2 = new DoubleSolenoid(0, 6, 7);
+        //solenoid2 = new DoubleSolenoid(0, 6, 7);
         
-        solenoid1.set(DoubleSolenoid.Value.kReverse);
-        solenoid2.set(DoubleSolenoid.Value.kReverse);
+        solenoid1.set(DoubleSolenoid.Value.kForward);
+        //solenoid2.set(DoubleSolenoid.Value.kReverse);
 
         compressor.setClosedLoopControl(true);
     }
 
     public void toggleSolenoids() {
         solenoid1.toggle();
-        solenoid2.toggle();
+        //solenoid2.toggle();
     }
 
     public void toggleCompressor() {

@@ -1,10 +1,11 @@
-package frc.robot;
+package frc.robot.shooter;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 
 public class Flywheel {
+    public static final double MAXRPM = 5800.0;
     
 
     private CANSparkMax motor;
@@ -19,7 +20,7 @@ public class Flywheel {
     public boolean setRPM(double rpm) {
         double currentRPM = getRPM();
 
-        if (currentRPM < rpm) {
+        if (currentRPM < rpm && rpm != 0) {
             motor.set(1);
         } else
         if (currentRPM > rpm) {

@@ -30,10 +30,14 @@ public class MecanumBuilder {
     }
 
     public MecanumDrive build() {
-        NeoMotor[] rfArray = (NeoMotor[]) rightFrontGroup.toArray();
-        NeoMotor[] rbArray = (NeoMotor[]) rightBackGroup.toArray();
-        NeoMotor[] lfArray = (NeoMotor[]) leftFrontGroup.toArray();
-        NeoMotor[] lbArray = (NeoMotor[]) leftBackGroup.toArray();
+        NeoMotor[] rfArray = new NeoMotor[rightFrontGroup.size()];
+        rfArray = rightFrontGroup.toArray(rfArray);
+        NeoMotor[] rbArray = new NeoMotor[rightBackGroup.size()];
+        rbArray = rightBackGroup.toArray(rbArray);
+        NeoMotor[] lfArray = new NeoMotor[leftFrontGroup.size()];
+        lfArray = leftFrontGroup.toArray(lfArray);
+        NeoMotor[] lbArray = new NeoMotor[leftBackGroup.size()];
+        lbArray = leftBackGroup.toArray(lbArray);
 
         return new MecanumDrive(new NeoMotor[][] {
             rfArray,

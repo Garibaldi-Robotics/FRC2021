@@ -2,36 +2,35 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.DriveMotors.Axis;
+import frc.robot.auto.AutoDrive;
+import frc.robot.auto.AutoInstruction;
+import frc.robot.auto.AutoRotate;
+import frc.robot.auto.AutoSequence;
 import frc.robot.drive.*;
+import frc.robot.shooter.Revolver;
 
 public class Robot extends TimedRobot {
 
-  public static MecanumDrive mecanumDrive;
-  public static Pneumatics pneumatics;
-  public static BNO08x imu;
+  MecanumDrive mecanumDrive;
+  BNO08x imu;
+  Revolver revolver;
 
   Joystick controller;
-
-  TeleopDrive teleop;
-  Flywheel flywheel;
-  
 
   @Override
   public void robotInit() {
     mecanumDrive = new MecanumBuilder()
-      .addMotorRF(0)
-      .addMotorLF(1)
-      .addMotorRB(2)
-      .addMotorLB(3)
+      .addMotorRF(1)
+      .addMotorLF(2)
+      .addMotorRB(3)
+      .addMotorLB(4)
       .build();
 
     //imu = new BNO08x();
     controller = new Joystick(0);
-    teleop = new TeleopDrive();
+    revolver = new Revolver(13, 5);
 
-    pneumatics = new Pneumatics();
-    flywheel = new Flywheel(5);
+    imu = new BNO08x();
   }
 
   @Override
@@ -39,47 +38,56 @@ public class Robot extends TimedRobot {
     
   }
 
-  TimedAuto timedAuto;
+  AutoSequence sequence = new AutoSequence();
 
   @Override
   public void autonomousInit() {
-    //imu.init();
+    imu.init();
 
-    timedAuto = new TimedAuto();
-    timedAuto.start();
+    sequence.addAll(new AutoInstruction[] {
+      new AutoDrive(mecanumDrive, 10),
+      new AutoRotate(mecanumDrive, imu, 90),
+    });
   }
 
   @Override
   public void autonomousPeriodic() {
-    
+    sequence.Execute();
   }
 
   @Override
   public void teleopInit() {
-    //imu.init();
+    imu.init();
   }
 
 
   @Override
   public void teleopPeriodic() {
-    //Vector3 rotation = imu.read();
+    revolver.Loop();
 
-    YourMa drive = teleop.drive(controller);
-    YourMa steering = teleop.rotate(controller, imu.read().y);
 
-    YourMa finalMove = YourMa.BlendBetween(drive, steering, 0.5);
+    //mecanumDrive.Drive(new Vector2(controller.getX() * controller.getRawAxis(3), controller.getY() * controller.getRawAxis(3)));
+    
+    YourMa motorctrl = TeleopDrive.drive(controller);
+    double speed = controller.getRawAxis(3);
 
-    //finalMove.drive(driveMotors, controller.getRawAxis(3));
+    
+    mecanumDrive.Drive(motorctrl.frontRight * speed, motorctrl.frontLeft * speed, motorctrl.backRight * speed, motorctrl.backLeft * speed);
 
-    if (controller.getRawButtonPressed(1)) {
-      pneumatics.toggleSolenoids();
+    if (controller.getRawButton(5))
+      revolver.Rev();
+    else
+      revolver.Slow();
+
+    if (controller.getRawButtonPressed(2)) {
+      revolver.Shoot();
+    }
+    if (controller.getRawButtonPressed(3)) {
+      //revolver.ToggleSolenoid();
     }
 
 
-    if (controller.getRawButton(2))
-      flywheel.setRPM(5800);
-    else
-      flywheel.setRPM(0);
+    
   }
 
   @Override

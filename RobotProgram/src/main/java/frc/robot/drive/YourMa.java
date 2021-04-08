@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.drive;
 
 /**
  * This holds information on how the motors should behave.
@@ -37,22 +37,20 @@ public class YourMa {
         backRight = yourMa.backRight;
     }
 
-    public YourMa(double frontLeft, double frontRight, double backLeft, double backRight) {
+    public YourMa(double frontRight, double frontLeft, double backRight, double backLeft) {
         this.frontLeft = frontLeft;
         this.frontRight = frontRight;
         this.backLeft = backLeft;
         this.backRight = backRight;
     }
 
-    public void scale(double scalar) {
+    public YourMa scale(double scalar) {
         frontLeft *= scalar;
         frontRight *= scalar;
         backLeft *= scalar;
         backRight *= scalar;
-    }
 
-    public void drive(DriveMotors drivetrain, double speed) {
-        drivetrain.drive(new double[] {frontLeft * speed, frontRight * speed, backLeft * speed, backRight * speed});
+        return this;
     }
     
     /**
@@ -65,28 +63,28 @@ public class YourMa {
     public static YourMa BlendBetween(YourMa dir1, YourMa dir2, double bias) {
         YourMa output = new YourMa();
 
-        output.frontLeft = ((dir1.frontLeft * bias) + (dir2.frontLeft * (1 - bias))) / 2;
         output.frontRight = ((dir1.frontRight * bias) + (dir2.frontRight * (1 - bias))) / 2;
-        output.backLeft = ((dir1.backLeft * bias) + (dir2.backLeft * (1 - bias))) / 2;
+        output.frontLeft = ((dir1.frontLeft * bias) + (dir2.frontLeft * (1 - bias))) / 2;
         output.backRight = ((dir1.backRight * bias) + (dir2.backRight * (1 - bias))) / 2;
+        output.backLeft = ((dir1.backLeft * bias) + (dir2.backLeft * (1 - bias))) / 2;
 
-        YourMa unsigned = new YourMa(Math.abs(output.frontLeft), Math.abs(output.frontRight), Math.abs(output.backLeft), Math.abs(output.backRight));
-        double max = Math.max(unsigned.frontLeft, Math.max(unsigned.frontRight, Math.max(unsigned.backLeft, unsigned.backRight)));
+        YourMa unsigned = new YourMa(Math.abs(output.frontRight), Math.abs(output.frontLeft), Math.abs(output.backRight), Math.abs(output.backLeft));
+        double max = Math.max(unsigned.frontRight, Math.max(unsigned.frontLeft, Math.max(unsigned.backRight, unsigned.backLeft)));
 
-        unsigned.frontLeft /= max;
         unsigned.frontRight /= max;
-        unsigned.backLeft /= max;
+        unsigned.frontLeft /= max;
         unsigned.backRight /= max;
+        unsigned.backLeft /= max;
 
         // restore signs
-        if (output.frontLeft < 0)
-            unsigned.frontLeft *= -1;
         if (output.frontRight < 0)
             unsigned.frontRight *= -1;
-        if (output.backLeft < 0)
-            unsigned.backLeft *= -1;
+        if (output.frontLeft < 0)
+            unsigned.frontLeft *= -1;
         if (output.backRight < 0)
             unsigned.backRight *= -1;
+        if (output.backLeft < 0)
+            unsigned.backLeft *= -1;
 
 
         return unsigned;

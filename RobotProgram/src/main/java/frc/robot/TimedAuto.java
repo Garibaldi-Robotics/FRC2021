@@ -21,8 +21,6 @@ public class TimedAuto {
     public boolean isTime(double time) {
 
         if (timer == null) {
-            System.out.println("TimedAuto needs to be started before the time can be checked");
-            System.exit(1);
             return false;
         }
         
